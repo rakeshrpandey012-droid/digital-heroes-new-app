@@ -2,18 +2,20 @@ const API_BASE_URL =
   import.meta.env.VITE_API_URL || "";
 
 async function request(endpoint, options = {}) {
-  const url = `${API_BASE_URL}${endpoint}`;
+  const response = await fetch(
+    `${API_BASE_URL}${endpoint}`,
+    {
+      credentials: "include",
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        ...(options.headers || {}),
+      },
+    }
+  );
 
-  const response = await fetch(url, {
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-      ...(options.headers || {}),
-    },
-    ...options,
-  });
-
-  const contentType = response.headers.get("content-type") || "";
+  const contentType =
+    response.headers.get("content-type") || "";
 
   let data;
 
@@ -23,7 +25,10 @@ async function request(endpoint, options = {}) {
     const text = await response.text();
 
     throw new Error(
-      `Server returned ${response.status}: ${text.substring(0, 200)}`
+      `Server returned ${response.status}: ${text.substring(
+        0,
+        300
+      )}`
     );
   }
 
@@ -38,9 +43,9 @@ async function request(endpoint, options = {}) {
   return data;
 }
 
-// --------------------------------------------------
-// AUTH
-// --------------------------------------------------
+/* =========================================================
+   AUTH
+========================================================= */
 
 export async function demoLogin() {
   return request("/api/auth/demo-login", {
@@ -74,92 +79,97 @@ export async function logoutUser() {
   });
 }
 
-// --------------------------------------------------
-// DRAWS
-// --------------------------------------------------
-
-export async function getCurrentDraw() {
-  return request("/api/draws/current", {
-    method: "GET",
-  });
-}
-
-export async function getLatestDraw() {
-  return request("/api/draws/latest", {
-    method: "GET",
-  });
-}
-
-export async function getDraws() {
-  return request("/api/draws", {
-    method: "GET",
-  });
-}
-
-// --------------------------------------------------
-// WINNERS
-// --------------------------------------------------
-
-export async function getWinners() {
-  return request("/api/draws/winners", {
-    method: "GET",
-  });
-}
-
-export async function getLatestWinners() {
-  return request("/api/winners", {
-    method: "GET",
-  });
-}
-
-// --------------------------------------------------
-// CHARITIES
-// --------------------------------------------------
-
-export async function getCharitySpotlight() {
-  return request("/api/charities/spotlight", {
-    method: "GET",
-  });
-}
-
-export async function getCharities() {
-  return request("/api/charities", {
-    method: "GET",
-  });
-}
-
-// --------------------------------------------------
-// SCORES
-// --------------------------------------------------
-
-export async function getScores() {
-  return request("/api/scores", {
-    method: "GET",
-  });
-}
-
-// --------------------------------------------------
-// ADMIN
-// --------------------------------------------------
-
-export async function getAdminDashboard() {
-  return request("/api/admin/dashboard", {
-    method: "GET",
-  });
-}
-
-// --------------------------------------------------
-// HEALTH
-// --------------------------------------------------
+/* =========================================================
+   HEALTH / DATABASE
+========================================================= */
 
 export async function getHealth() {
-  return request("/api/health", {
-    method: "GET",
-  });
+  return request("/api/health");
 }
 
 export async function getDatabaseStatus() {
-  return request("/api/database/status", {
-    method: "GET",
-  });
+  return request("/api/database/status");
 }
+
+/* =========================================================
+   DRAWS
+========================================================= */
+
+export async function getCurrentDraw() {
+  return request("/api/draws/current");
+}
+
+export async function getLatestDraw() {
+  return request("/api/draws/latest");
+}
+
+export async function getDraws() {
+  return request("/api/draws");
+}
+
+/* =========================================================
+   WINNERS
+========================================================= */
+
+export async function getWinners() {
+  return request("/api/draws/winners");
+}
+
+export async function getLatestWinners() {
+  return request("/api/winners");
+}
+
+/* =========================================================
+   CHARITIES
+========================================================= */
+
+export async function getCharities() {
+  return request("/api/charities");
+}
+
+export async function getCharitySpotlight() {
+  return request(
+    "/api/charities/spotlight"
+  );
+}
+
+/* =========================================================
+   SCORES
+========================================================= */
+
+export async function getScores() {
+  return request("/api/scores");
+}
+
+/* =========================================================
+   ADMIN
+========================================================= */
+
+export async function getAdminDashboard() {
+  return request("/api/admin/dashboard");
+}
+
+export default {
+  demoLogin,
+  loginUser,
+  registerUser,
+  getCurrentUser,
+  logoutUser,
+
+  getHealth,
+  getDatabaseStatus,
+
+  getCurrentDraw,
+  getLatestDraw,
+  getDraws,
+
+  getWinners,
+  getLatestWinners,
+
+  getCharities,
+  getCharitySpotlight,
+
+  getScores,
+
+  getAdminDashboard,
+};
